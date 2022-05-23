@@ -26,7 +26,7 @@ class DefaultStrategy extends CleanupStrategy
         });
 
         $backupsPerPeriod['daily'] = $this->groupByDateFormat($backupsPerPeriod['daily'], 'Ymd');
-        $backupsPerPeriod['weekly'] = $this->groupByDateFormat($backupsPerPeriod['weekly'], 'YW');
+        $backupsPerPeriod['weekly'] = $this->groupByDateIsoFormat($backupsPerPeriod['weekly'], '%G%V');
         $backupsPerPeriod['monthly'] = $this->groupByDateFormat($backupsPerPeriod['monthly'], 'Ym');
         $backupsPerPeriod['yearly'] = $this->groupByDateFormat($backupsPerPeriod['yearly'], 'Y');
 
@@ -67,6 +67,11 @@ class DefaultStrategy extends CleanupStrategy
         );
 
         return collect(compact('daily', 'weekly', 'monthly', 'yearly'));
+    }
+
+    protected function groupByDateIsoFormat(Collection $backups, string $dateFormat): Collection
+    {
+        return $backups->groupBy(fn (Backup $backup) => $backup->date()->isoFormat($dateFormat));
     }
 
     protected function groupByDateFormat(Collection $backups, string $dateFormat): Collection
